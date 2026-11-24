@@ -101,10 +101,11 @@ import {
         
         // Role ke hisab se redirect karein
         if (userRole === "admin") {
-          window.location.href = "admin-dashboard.html";
-        } else {
-          window.location.href = "./user-dashboard.html";
-        }
+  window.location.href = "./admin-dashboard.html";
+} else {
+  window.location.href = "./user-dashboard.html";
+}
+
       } else {
         statusText.innerText = "User role not found!";
       }
