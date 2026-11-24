@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login Iframe Page</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            background-color: #f4f4f9;
+        }
+        .iframe-container {
+            width: 100%;
+            max-width: 450px; /* लॉगिन बॉक्स की चौड़ाई */
+            height: 550px;    /* लॉगिन बॉक्स की ऊंचाई */
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            border-radius: 10px;
+            overflow: hidden;
+            background: #ffffff;
+        }
+        iframe {
+            width: 100%;
+            height: 100%;
+            border: none; /* डिफ़ॉल्ट बॉर्डर हटाने के लिए */
+        }
+    </style>
+</head>
+<body>
+
+    <div class="iframe-container">
+        <!-- यहाँ src में आपकी login.html फाइल का सही पाथ होना चाहिए -->
+        <iframe src="Login.html" title="Login Form">
+            आपका ब्राउज़र iframe को सपोर्ट नहीं करता है।
+        </iframe>
+    </div>
+
+</body>
+</html>
