@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Role-Based Login</title>
+  <style>
+    body { font-family: Arial, sans-serif; display: flex; justify-content: center; margin-top: 50px; }
+    .box { width: 300px; padding: 20px; border: 1px solid #ccc; border-radius: 8px; }
+    input, select, button { width: 100%; margin: 8px 0; padding: 8px; box-sizing: border-box; }
+  </style>
+</head>
+<body>
+
+<div class="box">
+  <h2>Signup / Login</h2>
+  <input type="email" id="email" placeholder="Email" required>
+  <input type="password" id="password" placeholder="Password" required>
+  
+  <!-- Signup ke waqt role chunne ke liye (Testing ke liye) -->
+  <select id="role">
+    <option value="user">User</option>
+    <option value="admin">Admin</option>
+  </select>
+
+  <button id="signupBtn">Register</button>
+  <button id="loginBtn">Login</button>
+  <p id="status"></p>
+</div>
+
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/13.4.0/firebase-app.js";
+
+import {
+  getAuth,
+  createUserWithEmailAndPassword,
+  signInWithEmailAndPassword
+} from "https://www.gstatic.com/firebasejs/13.4.0/firebase-auth.js";
+
+import {
+  getFirestore,
+  doc,
+  setDoc,
+  getDoc
+} from "https://www.gstatic.com/firebasejs/13.4.0/firebase-firestore.js";
+
+  // Apna Firebase Config yahan paste karein
+  const firebaseConfig = {
+    apiKey: "AIzaSyBElSlQCCJ-F-pWZjF5K06ROUITDe5Roqk",
+    authDomain: "login-17d67.firebaseapp.com",
+    databaseURL: "https://login-17d67-default-rtdb.asia-southeast1.firebasedatabase.app",
+    projectId: "login-17d67",
+    storageBucket: "login-17d67.firebasestorage.app",
+    messagingSenderId: "805328842530",
+    appId: "1:805328842530:web:ed6182cd8eb4a4b605bf7b",
+    measurementId: "G-DLKZLCP1R9"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+  const db = getFirestore(app);
+
+  const statusText = document.getElementById("status");
+
+  // 1. SIGNUP FUNCTION (User create + Role save)
+  document.getElementById("signupBtn").addEventListener("click", async () => {
+    const email = document.getElementById("email").value;
+    const password = document.getElementById("password").value;
+    const role = document.getElementById("role").value;
+
+    try {
+      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+      const user = userCredential.user;
+
+      // Firestore mein user ka role save karein
+      await setDoc(doc(db, "users", user.uid), {
+        email: email,
+        role: role
+      });
+
+      statusText.innerText = "Account created as " + role + "!";
+    } catch (error) {
+      statusText.innerText = "Error: " + error.message;
+    }
+  });
+
+  // 2. LOGIN FUNCTION (Login + Role check)
+  document.getElementById("loginBtn").addEventListener("click", async () => {
+    const email = document.getElementById("email").value;
+    const password = document.getElementById("password").value;
+
+    try {
+      const userCredential = await signInWithEmailAndPassword(auth, email, password);
+      const user = userCredential.user;
+
+      // Firestore se user ka role fetch karein
+      const docRef = doc(db, "users", user.uid);
+      const docSnap = await getDoc(docRef);
+
+      if (docSnap.exists()) {
+        const userRole = docSnap.data().role;
+        
+        // Role ke hisab se redirect karein
+        if (userRole === "admin") {
+          window.location.href = "admin-dashboard.html";
+        } else {
+          window.location.href = "user-dashboard.html";
+        }
+      } else {
+        statusText.innerText = "User role not found!";
+      }
+    } catch (error) {
+      statusText.innerText = "Login Error: " + error.message;
+    }
+  });
+</script>
+
+</body>
+</html>
