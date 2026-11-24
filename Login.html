@@ -84,7 +84,7 @@ import {
     }
   });
 
-  // 2. LOGIN FUNCTION (Login + Role check)
+    // 2. LOGIN FUNCTION (Auto-Recovery ke saath)
   document.getElementById("loginBtn").addEventListener("click", async () => {
     const email = document.getElementById("email").value;
     const password = document.getElementById("password").value;
@@ -98,22 +98,29 @@ import {
       const docSnap = await getDoc(docRef);
 
       if (docSnap.exists()) {
+        // Agar document maujood hai toh role check karke redirect karein
         const userRole = docSnap.data().role;
         
-        // Role ke hisab se redirect karein
         if (userRole === "admin") {
-  window.location.href = "./admin-dashboard.html";
-} else {
-  window.location.href = "./user-dashboard.html";
-}
-
+          window.location.href = "./admin-dashboard.html";
+        } else {
+          window.location.href = "./user-dashboard.html";
+        }
       } else {
-        statusText.innerText = "User role not found!";
+        // AUTO-RECOVERY: Agar document galti se delete ho gaya tha, toh wapas bana dein
+        await setDoc(docRef, {
+          email: user.email,
+          role: "user"
+        });
+        
+        statusText.innerText = "Profile restored! Redirecting...";
+        window.location.href = "./user-dashboard.html";
       }
     } catch (error) {
       statusText.innerText = "Login Error: " + error.message;
     }
   });
+
 </script>
 
 </body>
