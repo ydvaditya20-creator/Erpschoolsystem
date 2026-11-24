@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>User Dashboard</title>
+  <style>
+    body { font-family: Arial, sans-serif; padding: 30px; background: #eef2f7; }
+    .container { max-width: 600px; margin: auto; background: white; padding: 25px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+    .badge { background: #0275d8; color: white; padding: 4px 10px; border-radius: 4px; font-size: 14px; }
+    button { background: #333; color: white; border: none; padding: 10px 15px; border-radius: 5px; cursor: pointer; margin-top: 20px; }
+    #content { display: none; }
+  </style>
+</head>
+<body>
+
+<div id="loading">Loading Profile...</div>
+
+<div class="container" id="content">
+  <h2>User Dashboard <span class="badge">USER</span></h2>
+  <p>Hello, <strong id="userEmail"></strong>!</p>
+  <p>Aap successfully apne user account mein logged in hain.</p>
+  <button id="logoutBtn">Logout</button>
+</div>
+
+<script type="module">
+  import { initializeApp } from "https://gstatic.com";
+  import { getAuth, onAuthStateChanged, signOut } from "https://gstatic.com";
+  import { getFirestore, doc, getDoc } from "https://gstatic.com";
+
+  // Apna Firebase Config yahan paste karein
+  const firebaseConfig = {
+    apiKey: "YOUR_API_KEY",
+    authDomain: "YOUR_PROJECT_://firebaseapp.com",
+    projectId: "YOUR_PROJECT_ID",
+    storageBucket: "YOUR_PROJECT_://appspot.com",
+    messagingSenderId: "YOUR_SENDER_ID",
+    appId: "YOUR_APP_ID"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+  const db = getFirestore(app);
+
+  // Security Check: Sirf logged-in users ke liye
+  onAuthStateChanged(auth, async (user) => {
+    if (user) {
+      const docSnap = await getDoc(doc(db, "users", user.uid));
+      
+      if (docSnap.exists()) {
+        document.getElementById("loading").style.display = "none";
+        document.getElementById("content").style.display = "block";
+        document.getElementById("userEmail").innerText = user.email;
+      }
+    } else {
+      // Login nahi hai toh wapas login page par bhejein
+      window.location.href = "index.html";
+    }
+  });
+
+  // Logout Function
+  document.getElementById("logoutBtn").addEventListener("click", async () => {
+    await signOut(auth);
+    window.location.href = "index.html";
+  });
+</script>
+
+</body>
+</html>
